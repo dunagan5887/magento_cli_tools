@@ -1,0 +1,69 @@
+diff --git a/vendor/magento/framework/View/Element/BlockFactory.php b/vendor/magento/framework/View/Element/BlockFactory.php
+index 08f6628..abb19f3 100644
+--- a/vendor/magento/framework/View/Element/BlockFactory.php
++++ b/vendor/magento/framework/View/Element/BlockFactory.php
+@@ -19,14 +19,17 @@ class BlockFactory
+      */
+     protected $objectManager;
+ 
++    protected $_logger;
++
+     /**
+      * Constructor
+      *
+      * @param ObjectManagerInterface $objectManager
+      */
+-    public function __construct(ObjectManagerInterface $objectManager)
++    public function __construct(ObjectManagerInterface $objectManager, \Psr\Log\LoggerInterface $logger)
+     {
+         $this->objectManager = $objectManager;
++        $this->_logger = $logger;
+     }
+ 
+     /**
+@@ -40,6 +43,9 @@ class BlockFactory
+     public function createBlock($blockName, array $arguments = [])
+     {
+         $blockName = ltrim($blockName, '\\');
++
++        $this->_logger->info($blockName);
++
+         $block = $this->objectManager->create($blockName, $arguments);
+         if (!$block instanceof BlockInterface) {
+             throw new \LogicException($blockName . ' does not implement BlockInterface');
+diff --git a/vendor/magento/framework/View/Element/Template.php b/vendor/magento/framework/View/Element/Template.php
+index 136ab32..d756dc1 100644
+--- a/vendor/magento/framework/View/Element/Template.php
++++ b/vendor/magento/framework/View/Element/Template.php
+@@ -276,6 +276,11 @@ class Template extends AbstractBlock
+         if (!$this->getTemplate()) {
+             return '';
+         }
++
++        $this->_logger->info(get_class($this));
++        $this->_logger->info($this->getNameInLayout());
++        $this->_logger->info($this->getTemplateFile());
++
+         return $this->fetchView($this->getTemplateFile());
+     }
+ 
+diff --git a/vendor/magento/framework/View/Model/Layout/Merge.php b/vendor/magento/framework/View/Model/Layout/Merge.php
+index 5adb074..6b2419e 100644
+--- a/vendor/magento/framework/View/Model/Layout/Merge.php
++++ b/vendor/magento/framework/View/Model/Layout/Merge.php
+@@ -235,9 +235,15 @@ class Merge implements \Magento\Framework\View\Layout\ProcessorInterface
+     {
+         if (is_array($handleName)) {
+             foreach ($handleName as $name) {
++
++                $this->logger->info('Added handle: ' . $name);
++
+                 $this->handles[$name] = 1;
+             }
+         } else {
++
++            $this->logger->info('Added handle: ' . $handleName);
++
+             $this->handles[$handleName] = 1;
+         }
+         return $this;

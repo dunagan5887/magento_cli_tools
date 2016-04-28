@@ -1,0 +1,64 @@
+#!/bin/sh
+
+script_dir=$(dirname $0)
+tools_dir="$script_dir/mage_tools"
+LOG_LAYOUT_PATCH="$tools_dir/log_layout_patch.patch"
+LOG_MYSQL_PATCH="$tools_dir/log_mysql_patch.patch"
+ENABLE_ALL_ERRORS_PATCH="$tools_dir/error_reporting_all.patch"
+
+case $1 in
+tail_logs)
+tail -f -n 500 var/log/system.log var/log/exception.log /var/log/php_errors.log /var/log/fpm-php.www.log /var/log/nginx/error.log
+;;
+tail_all_logs)
+tail -f -n 500 var/log/* /var/log/php_errors.log /var/log/fpm-php.www.log /var/log/nginx/error.log
+;;
+log_layout)
+echo $LOG_LAYOUT_PATCH
+cat $LOG_LAYOUT_PATCH | patch -p1
+echo "Layout Log has been enabled"
+;;
+checkout_layout)
+git checkout app/code/core/Mage/Core/Block/Template.php
+git checkout app/code/core/Mage/Core/Model/Layout/Update.php
+echo "Layout is no longer being logged"
+;;
+flush_logs)
+echo "" > var/log/system.log
+echo "" > var/log/exception.log
+echo "" > var/debug/pdo_mysql.log
+echo "Logs have been flushed"
+;;
+log_mysql)
+cat $LOG_MYSQL_PATCH | patch -p1
+echo "MYSQL Log has been enabled"
+;;
+tail_mysql)
+tail -f -n 300 var/debug/pdo_mysql.log
+;;
+checkout_mysql)
+git checkout lib/Varien/Db/Adapter/Pdo/Mysql.php
+echo "MYSQL queries are no longer being logged"
+;;
+clear_cache)
+rm -rf var/cache var/full_page_cache
+echo "Cache has been cleared"
+;;
+log_all_errors)
+cat $ENABLE_ALL_ERRORS_PATCH | patch -p1
+echo "All PHP errors will now be logged."
+;;
+greset)
+git reset --hard HEAD
+;;
+flush_all)
+rm -f var/log/system.log var/log/exception.log var/debug/pdo_mysql.log
+echo "Logs have been flushed"
+rm -rf var/cache var/full_page_cache
+echo "Cache has been cleared"
+;;
+*)
+echo "Usage $0 {log_layout|flush_logs|log_mysql|tail_mysql|clear_cache|greset|flush_all}" >$2
+exit 1
+;;
+esac

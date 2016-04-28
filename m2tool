@@ -1,0 +1,65 @@
+#!/bin/sh
+
+script_dir=$(dirname $0)
+tools_dir="$script_dir/mage_2_tools"
+LOG_MYSQL_PATCH="$tools_dir/m2tool_log_mysql.patch"
+CHECKOUT_LOG_MYSQL_PATCH="$tools_dir/m2tool_checkout_mysql.patch"
+ENABLE_LAYOUT_LOG_PATCH="$tools_dir/m2tool_enable_layout_log.patch"
+CHECKOUT_LAYOUT_LOG_PATCH="$tools_dir/m2tool_checkout_layout_log.patch"
+
+case $1 in
+module_enable)
+php bin/magento module:enable $2
+rm -rf var/cache
+php bin/magento setup:upgrade
+rm -rf var/cache
+echo "Module $2 has been enabled. Cache was cleared and the database was updated for the change to take effect"
+;;
+module_disable)
+php bin/magento module:disable $2
+rm -rf var/cache
+php bin/magento setup:upgrade
+rm -rf var/cache
+echo "Module $2 has been disabled. Cache was cleared and the database was updated for the change to take effect"
+;;
+log_mysql)
+cat $LOG_MYSQL_PATCH | patch -p1
+rm -rf var/cache
+echo "MYSQL Log has been enabled. Cache was cleared for change to take effect"
+;;
+tail_mysql)
+tail -f -n 300 var/log/mysql_all_queries.log
+;;
+checkout_mysql)
+cat $CHECKOUT_LOG_MYSQL_PATCH | patch -p1
+rm -rf var/cache
+echo "MYSQL Log is no longer enabled. Cache was cleared for change to take effect"
+;;
+tail_errors)
+tail -f -n 500 /var/log/cli_php_errors.log /var/log/php_errors.log var/log/exception.log var/log/system.log
+;;
+log_layout)
+cat $ENABLE_LAYOUT_LOG_PATCH | patch -p1
+echo "Layout Log has been enabled"
+;;
+tail_layout)
+tail -f -n 500 var/log/system.log
+;;
+checkout_layout)
+cat $CHECKOUT_LAYOUT_LOG_PATCH | patch -p1
+echo "Layout is no longer being logged"
+;;
+flush_logs)
+echo "" > var/log/system.log
+echo "" > var/log/mysql_all_queries.log
+echo "" > var/log/debug.log
+echo "Logs have been flushed"
+;;
+reindex)
+php bin/magento indexer:reindex
+;;
+flush_cache)
+php bin/magento cache:flush
+;;
+esac
+

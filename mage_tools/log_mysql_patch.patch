@@ -1,0 +1,22 @@
+diff --git a/lib/Varien/Db/Adapter/Pdo/Mysql.php b/lib/Varien/Db/Adapter/Pdo/Mysql.php
+index 80ed9b5..42b57c7 100644
+--- a/lib/Varien/Db/Adapter/Pdo/Mysql.php
++++ b/lib/Varien/Db/Adapter/Pdo/Mysql.php
+@@ -100,7 +100,7 @@ class Varien_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Mysql implements V
+      *
+      * @var bool
+      */
+-    protected $_debug               = false;
++    protected $_debug               = true;
+ 
+     /**
+      * Minimum query duration time to be logged
+@@ -114,7 +114,7 @@ class Varien_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Mysql implements V
+      *
+      * @var bool
+      */
+-    protected $_logAllQueries       = false;
++    protected $_logAllQueries       = true;
+ 
+     /**
+      * Add to log call stack data (backtrace)

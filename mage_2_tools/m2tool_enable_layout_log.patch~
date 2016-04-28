@@ -1,0 +1,16 @@
+diff --git a/vendor/magento/framework/View/Element/Template.php b/vendor/magento/framework/View/Element/Template.php
+index 136ab32..d756dc1 100644
+--- a/vendor/magento/framework/View/Element/Template.php
++++ b/vendor/magento/framework/View/Element/Template.php
+@@ -276,6 +276,11 @@ class Template extends AbstractBlock
+         if (!$this->getTemplate()) {
+             return '';
+         }
++
++        $this->_logger->info(get_class($this));
++        $this->_logger->info($this->getNameInLayout());
++        $this->_logger->info($this->getTemplateFile());
++
+         return $this->fetchView($this->getTemplateFile());
+     }
+ 

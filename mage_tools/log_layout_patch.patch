@@ -1,0 +1,28 @@
+diff --git a/app/code/core/Mage/Core/Block/Template.php b/app/code/core/Mage/Core/Block/Template.php
+index a6d310b..16071f4 100644
+--- a/app/code/core/Mage/Core/Block/Template.php
++++ b/app/code/core/Mage/Core/Block/Template.php
+@@ -280,6 +280,10 @@ HTML;
+      */
+     protected function _toHtml()
+     {
++        Mage::log(get_class($this));
++        Mage::log($this->getNameInLayout());
++        Mage::log($this->getTemplateFile());
++
+         if (!$this->getTemplate()) {
+             return '';
+         }
+diff --git a/app/code/core/Mage/Core/Model/Layout/Update.php b/app/code/core/Mage/Core/Model/Layout/Update.php
+index f8296e9..f271d85 100644
+--- a/app/code/core/Mage/Core/Model/Layout/Update.php
++++ b/app/code/core/Mage/Core/Model/Layout/Update.php
+@@ -126,6 +126,8 @@ class Mage_Core_Model_Layout_Update
+ 
+     public function addHandle($handle)
+     {
++        Mage::log($handle);
++
+         if (is_array($handle)) {
+             foreach ($handle as $h) {
+                 $this->_handles[$h] = 1;

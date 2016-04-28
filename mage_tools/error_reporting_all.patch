@@ -1,0 +1,40 @@
+diff --git a/app/code/core/Mage/Core/functions.php b/app/code/core/Mage/Core/functions.php
+index 336b08e..4c18b1b 100644
+--- a/app/code/core/Mage/Core/functions.php
++++ b/app/code/core/Mage/Core/functions.php
+@@ -164,7 +164,7 @@ function mageCoreErrorHandler($errno, $errstr, $errfile, $errline){
+         return false;
+     }
+ 
+-    $errno = $errno & error_reporting();
++    //$errno = $errno & error_reporting();
+     if ($errno == 0) {
+         return false;
+     }
+diff --git a/index.php b/index.php
+index a750a23..854b9a1 100644
+--- a/index.php
++++ b/index.php
+@@ -24,6 +24,9 @@
+  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+  */
+ 
++error_reporting(E_ALL);
++ini_set('error_reporting', E_ALL);
++
+ if (version_compare(phpversion(), '5.3.0', '<')===true) {
+     echo  '<div style="font:12px/1.35em arial, helvetica, sans-serif;">
+ <div style="margin:0 0 25px 0; border-bottom:1px solid #ccc;">
+diff --git a/lib/Zend/Mail/Transport/Sendmail.php b/lib/Zend/Mail/Transport/Sendmail.php
+index b24026b..6251c55 100644
+--- a/lib/Zend/Mail/Transport/Sendmail.php
++++ b/lib/Zend/Mail/Transport/Sendmail.php
+@@ -134,7 +134,7 @@ class Zend_Mail_Transport_Sendmail extends Zend_Mail_Transport_Abstract
+              * @see Zend_Mail_Transport_Exception
+              */
+             #require_once 'Zend/Mail/Transport/Exception.php';
+-            throw new Zend_Mail_Transport_Exception('Unable to send mail. ' . $this->_errstr);
++           // throw new Zend_Mail_Transport_Exception('Unable to send mail. ' . $this->_errstr);
+         }
+     }
+ 
