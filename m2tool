@@ -61,5 +61,8 @@ php bin/magento indexer:reindex
 flush_cache)
 php bin/magento cache:flush
 ;;
+setup_upgrade)
+php bin/magento setup:upgrade
+;;
 esac
 
