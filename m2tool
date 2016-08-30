@@ -22,6 +22,10 @@ php bin/magento setup:upgrade
 rm -rf var/cache
 echo "Module $2 has been disabled. Cache was cleared and the database was updated for the change to take effect"
 ;;
+debug_cron)
+/usr/bin/php -dxdebug.remote_autostart=On bin/magento cron:run >> var/log/magento.cron.log
+echo "Magento cron was executed with xdebug enabled"
+;;
 log_mysql)
 cat $LOG_MYSQL_PATCH | patch -p1
 rm -rf var/cache
@@ -53,6 +57,9 @@ flush_logs)
 echo "" > var/log/system.log
 echo "" > var/log/mysql_all_queries.log
 echo "" > var/log/debug.log
+echo "" > var/log/exception.log
+echo "" > var/log/install.log
+echo "" > var/log/magento.cron.log
 echo "Logs have been flushed"
 ;;
 reindex)

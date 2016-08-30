@@ -1,5 +1,38 @@
+diff --git a/vendor/magento/framework/View/Element/BlockFactory.php b/vendor/magento/framework/View/Element/BlockFactory.php
+index f3b8adc..3244f41 100644
+--- a/vendor/magento/framework/View/Element/BlockFactory.php
++++ b/vendor/magento/framework/View/Element/BlockFactory.php
+@@ -19,17 +19,14 @@ class BlockFactory
+      */
+     protected $objectManager;
+ 
+-    protected $_logger;
+-
+     /**
+      * Constructor
+      *
+      * @param ObjectManagerInterface $objectManager
+      */
+-    public function __construct(ObjectManagerInterface $objectManager, \Psr\Log\LoggerInterface $logger)
++    public function __construct(ObjectManagerInterface $objectManager)
+     {
+         $this->objectManager = $objectManager;
+-        $this->_logger = $logger;
+     }
+ 
+     /**
+@@ -43,9 +40,6 @@ class BlockFactory
+     public function createBlock($blockName, array $arguments = [])
+     {
+         $blockName = ltrim($blockName, '\\');
+-
+-        $this->_logger->info($blockName);
+-
+         $block = $this->objectManager->create($blockName, $arguments);
+         if (!$block instanceof BlockInterface) {
+             throw new \LogicException($blockName . ' does not implement BlockInterface');
 diff --git a/vendor/magento/framework/View/Element/Template.php b/vendor/magento/framework/View/Element/Template.php
-index d756dc1..136ab32 100644
+index 40764b8..f011c1e 100644
 --- a/vendor/magento/framework/View/Element/Template.php
 +++ b/vendor/magento/framework/View/Element/Template.php
 @@ -276,11 +276,6 @@ class Template extends AbstractBlock
@@ -14,3 +47,23 @@ index d756dc1..136ab32 100644
          return $this->fetchView($this->getTemplateFile());
      }
  
+diff --git a/vendor/magento/framework/View/Model/Layout/Merge.php b/vendor/magento/framework/View/Model/Layout/Merge.php
+index 4f2f0e2..d419f44 100644
+--- a/vendor/magento/framework/View/Model/Layout/Merge.php
++++ b/vendor/magento/framework/View/Model/Layout/Merge.php
+@@ -235,15 +235,9 @@ class Merge implements \Magento\Framework\View\Layout\ProcessorInterface
+     {
+         if (is_array($handleName)) {
+             foreach ($handleName as $name) {
+-
+-                $this->logger->info('Added handle: ' . $name);
+-
+                 $this->handles[$name] = 1;
+             }
+         } else {
+-
+-            $this->logger->info('Added handle: ' . $handleName);
+-
+             $this->handles[$handleName] = 1;
+         }
+         return $this;
