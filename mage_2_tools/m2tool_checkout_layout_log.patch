@@ -1,3 +1,32 @@
+diff --git a/vendor/magento/framework/View/Element/AbstractBlock.php b/vendor/magento/framework/View/Element/AbstractBlock.php
+index 4ad04e1..64897b4 100644
+--- a/vendor/magento/framework/View/Element/AbstractBlock.php
++++ b/vendor/magento/framework/View/Element/AbstractBlock.php
+@@ -639,12 +639,6 @@ abstract class AbstractBlock extends \Magento\Framework\DataObject implements Bl
+      */
+     public function toHtml()
+     {
+-        $this->_logger->info('Abstract toHtml');
+-        $this->_logger->info('Block: ' . get_class($this));
+-        $this->_logger->info('Layout Name' . $this->getNameInLayout());
+-
+-
+-
+         $this->_eventManager->dispatch('view_block_abstract_to_html_before', ['block' => $this]);
+         if ($this->_scopeConfig->getValue(
+             'advanced/modules_disable_output/' . $this->getModuleName(),
+@@ -968,11 +962,6 @@ abstract class AbstractBlock extends \Magento\Framework\DataObject implements Bl
+      */
+     public function getCacheKey()
+     {
+-        $this->_logger->info('getCacheKey');
+-        $this->_logger->info('Block: ' . get_class($this));
+-        $this->_logger->info('Layout Name' . $this->getNameInLayout());
+-
+-
+         if ($this->hasData('cache_key')) {
+             return static::CACHE_KEY_PREFIX . $this->getData('cache_key');
+         }
 diff --git a/vendor/magento/framework/View/Element/BlockFactory.php b/vendor/magento/framework/View/Element/BlockFactory.php
 index f3b8adc..3244f41 100644
 --- a/vendor/magento/framework/View/Element/BlockFactory.php
@@ -32,17 +61,22 @@ index f3b8adc..3244f41 100644
          if (!$block instanceof BlockInterface) {
              throw new \LogicException($blockName . ' does not implement BlockInterface');
 diff --git a/vendor/magento/framework/View/Element/Template.php b/vendor/magento/framework/View/Element/Template.php
-index 40764b8..f011c1e 100644
+index 770545d..f011c1e 100644
 --- a/vendor/magento/framework/View/Element/Template.php
 +++ b/vendor/magento/framework/View/Element/Template.php
-@@ -276,11 +276,6 @@ class Template extends AbstractBlock
+@@ -243,8 +243,6 @@ class Template extends AbstractBlock
+      */
+     public function fetchView($fileName)
+     {
+-        $this->_logger->info('fetchView Template: ' . $this->getTemplateFile());
+-
+         $relativeFilePath = $this->getRootDirectory()->getRelativePath($fileName);
+         \Magento\Framework\Profiler::start(
+             'TEMPLATE:' . $fileName,
+@@ -278,7 +276,6 @@ class Template extends AbstractBlock
          if (!$this->getTemplate()) {
              return '';
          }
--
--        $this->_logger->info(get_class($this));
--        $this->_logger->info($this->getNameInLayout());
--        $this->_logger->info($this->getTemplateFile());
 -
          return $this->fetchView($this->getTemplateFile());
      }

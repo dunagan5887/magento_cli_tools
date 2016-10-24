@@ -1,5 +1,34 @@
+diff --git a/vendor/magento/framework/View/Element/AbstractBlock.php b/vendor/magento/framework/View/Element/AbstractBlock.php
+index 64897b4..4ad04e1 100644
+--- a/vendor/magento/framework/View/Element/AbstractBlock.php
++++ b/vendor/magento/framework/View/Element/AbstractBlock.php
+@@ -639,6 +639,12 @@ abstract class AbstractBlock extends \Magento\Framework\DataObject implements Bl
+      */
+     public function toHtml()
+     {
++        $this->_logger->info('Abstract toHtml');
++        $this->_logger->info('Block: ' . get_class($this));
++        $this->_logger->info('Layout Name' . $this->getNameInLayout());
++
++
++
+         $this->_eventManager->dispatch('view_block_abstract_to_html_before', ['block' => $this]);
+         if ($this->_scopeConfig->getValue(
+             'advanced/modules_disable_output/' . $this->getModuleName(),
+@@ -962,6 +968,11 @@ abstract class AbstractBlock extends \Magento\Framework\DataObject implements Bl
+      */
+     public function getCacheKey()
+     {
++        $this->_logger->info('getCacheKey');
++        $this->_logger->info('Block: ' . get_class($this));
++        $this->_logger->info('Layout Name' . $this->getNameInLayout());
++
++
+         if ($this->hasData('cache_key')) {
+             return static::CACHE_KEY_PREFIX . $this->getData('cache_key');
+         }
 diff --git a/vendor/magento/framework/View/Element/BlockFactory.php b/vendor/magento/framework/View/Element/BlockFactory.php
-index 08f6628..abb19f3 100644
+index 3244f41..f3b8adc 100644
 --- a/vendor/magento/framework/View/Element/BlockFactory.php
 +++ b/vendor/magento/framework/View/Element/BlockFactory.php
 @@ -19,14 +19,17 @@ class BlockFactory
@@ -32,23 +61,28 @@ index 08f6628..abb19f3 100644
          if (!$block instanceof BlockInterface) {
              throw new \LogicException($blockName . ' does not implement BlockInterface');
 diff --git a/vendor/magento/framework/View/Element/Template.php b/vendor/magento/framework/View/Element/Template.php
-index 136ab32..d756dc1 100644
+index f011c1e..770545d 100644
 --- a/vendor/magento/framework/View/Element/Template.php
 +++ b/vendor/magento/framework/View/Element/Template.php
-@@ -276,6 +276,11 @@ class Template extends AbstractBlock
+@@ -243,6 +243,8 @@ class Template extends AbstractBlock
+      */
+     public function fetchView($fileName)
+     {
++        $this->_logger->info('fetchView Template: ' . $this->getTemplateFile());
++
+         $relativeFilePath = $this->getRootDirectory()->getRelativePath($fileName);
+         \Magento\Framework\Profiler::start(
+             'TEMPLATE:' . $fileName,
+@@ -276,6 +278,7 @@ class Template extends AbstractBlock
          if (!$this->getTemplate()) {
              return '';
          }
-+
-+        $this->_logger->info(get_class($this));
-+        $this->_logger->info($this->getNameInLayout());
-+        $this->_logger->info($this->getTemplateFile());
 +
          return $this->fetchView($this->getTemplateFile());
      }
  
 diff --git a/vendor/magento/framework/View/Model/Layout/Merge.php b/vendor/magento/framework/View/Model/Layout/Merge.php
-index 5adb074..6b2419e 100644
+index d419f44..4f2f0e2 100644
 --- a/vendor/magento/framework/View/Model/Layout/Merge.php
 +++ b/vendor/magento/framework/View/Model/Layout/Merge.php
 @@ -235,9 +235,15 @@ class Merge implements \Magento\Framework\View\Layout\ProcessorInterface
