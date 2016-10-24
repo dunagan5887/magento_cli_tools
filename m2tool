@@ -22,6 +22,13 @@ php bin/magento setup:upgrade
 rm -rf var/cache
 echo "Module $2 has been disabled. Cache was cleared and the database was updated for the change to take effect"
 ;;
+module_uninstall)
+php bin/magento module:uninstall $2
+rm -rf var/cache
+php bin/magento setup:upgrade
+rm -rf var/cache
+echo "Module $2 has been uninstalled. Cache was cleared and the database was updated for the change to take effect"
+;;
 debug_cron)
 /usr/bin/php -dxdebug.remote_autostart=On bin/magento cron:run >> var/log/magento.cron.log
 echo "Magento cron was executed with xdebug enabled"
@@ -70,6 +77,10 @@ php bin/magento cache:flush
 ;;
 setup_upgrade)
 php bin/magento setup:upgrade
+;;
+wipe_db)
+rm -rf var/cache/ var/page_cache/ app/etc/config.php app/etc/env.php
+echo "Database has been wiped from the Magento instance"
 ;;
 esac
 
