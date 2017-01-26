@@ -47,7 +47,7 @@ rm -rf var/cache
 echo "MYSQL Log is no longer enabled. Cache was cleared for change to take effect"
 ;;
 tail_errors)
-tail -f -n 500 /var/log/cli_php_errors.log /var/log/php_errors.log var/log/exception.log var/log/system.log
+tail -f -n 500 /var/log/cli_php_errors.log /var/log/php_errors.log var/log/exception.log var/log/system.log var/log/support_report.log
 ;;
 log_layout)
 cat $ENABLE_LAYOUT_LOG_PATCH | patch -p1
@@ -55,6 +55,9 @@ echo "Layout Log has been enabled"
 ;;
 tail_layout)
 tail -f -n 500 var/log/system.log
+;;
+enterprise_tail_layout)
+tail -f -n 500 var/log/support_report.log
 ;;
 checkout_layout)
 cat $CHECKOUT_LAYOUT_LOG_PATCH | patch -p1
@@ -67,6 +70,7 @@ echo "" > var/log/debug.log
 echo "" > var/log/exception.log
 echo "" > var/log/install.log
 echo "" > var/log/magento.cron.log
+echo "" > var/log/support_report.log
 echo "Logs have been flushed"
 ;;
 reindex)

@@ -1,79 +1,90 @@
 diff --git a/vendor/magento/framework/View/Element/AbstractBlock.php b/vendor/magento/framework/View/Element/AbstractBlock.php
-index 4ad04e1..64897b4 100644
+index f12c994..1700186 100644
 --- a/vendor/magento/framework/View/Element/AbstractBlock.php
 +++ b/vendor/magento/framework/View/Element/AbstractBlock.php
-@@ -639,12 +639,6 @@ abstract class AbstractBlock extends \Magento\Framework\DataObject implements Bl
+@@ -641,12 +641,6 @@ abstract class AbstractBlock extends \Magento\Framework\DataObject implements Bl
       */
      public function toHtml()
      {
--        $this->_logger->info('Abstract toHtml');
--        $this->_logger->info('Block: ' . get_class($this));
--        $this->_logger->info('Layout Name' . $this->getNameInLayout());
+-
+-        $string_to_log = $this->getNameInLayout() . ': Abstract toHtml - Block class: ' . get_class($this) . "\n";
+-        $this->_logger->info($string_to_log);
 -
 -
 -
          $this->_eventManager->dispatch('view_block_abstract_to_html_before', ['block' => $this]);
          if ($this->_scopeConfig->getValue(
              'advanced/modules_disable_output/' . $this->getModuleName(),
-@@ -968,11 +962,6 @@ abstract class AbstractBlock extends \Magento\Framework\DataObject implements Bl
+@@ -970,10 +964,6 @@ abstract class AbstractBlock extends \Magento\Framework\DataObject implements Bl
       */
      public function getCacheKey()
      {
--        $this->_logger->info('getCacheKey');
--        $this->_logger->info('Block: ' . get_class($this));
--        $this->_logger->info('Layout Name' . $this->getNameInLayout());
+-        $string_to_log = $this->getNameInLayout() . ' getCacheKey - Block: ' . get_class($this) . "\n";
+-        $this->_logger->info($string_to_log);
 -
 -
          if ($this->hasData('cache_key')) {
              return static::CACHE_KEY_PREFIX . $this->getData('cache_key');
          }
 diff --git a/vendor/magento/framework/View/Element/BlockFactory.php b/vendor/magento/framework/View/Element/BlockFactory.php
-index f3b8adc..3244f41 100644
+index 20348af..8c75a31 100644
 --- a/vendor/magento/framework/View/Element/BlockFactory.php
 +++ b/vendor/magento/framework/View/Element/BlockFactory.php
-@@ -19,17 +19,14 @@ class BlockFactory
+@@ -21,13 +21,10 @@ class BlockFactory
       */
      protected $objectManager;
  
--    protected $_logger;
+-    protected $_logger = null;
 -
      /**
       * Constructor
       *
       * @param ObjectManagerInterface $objectManager
+-     * @param \Psr\Log\LoggerInterface $logger
       */
--    public function __construct(ObjectManagerInterface $objectManager, \Psr\Log\LoggerInterface $logger)
-+    public function __construct(ObjectManagerInterface $objectManager)
+     public function __construct(ObjectManagerInterface $objectManager)
      {
-         $this->objectManager = $objectManager;
--        $this->_logger = $logger;
-     }
- 
-     /**
-@@ -43,9 +40,6 @@ class BlockFactory
+@@ -45,9 +42,6 @@ class BlockFactory
      public function createBlock($blockName, array $arguments = [])
      {
          $blockName = ltrim($blockName, '\\');
 -
--        $this->_logger->info($blockName);
+-        $this->_getLogger()->info("Creating block: " . $blockName);
 -
          $block = $this->objectManager->create($blockName, $arguments);
          if (!$block instanceof BlockInterface) {
              throw new \LogicException($blockName . ' does not implement BlockInterface');
+@@ -57,15 +51,4 @@ class BlockFactory
+         }
+         return $block;
+     }
+-
+-
+-    protected function _getLogger()
+-    {
+-        if (is_null($this->_logger))
+-        {
+-            $this->_logger = $this->objectManager->get('\Psr\Log\LoggerInterface');
+-        }
+-
+-        return $this->_logger;
+-    }
+ }
 diff --git a/vendor/magento/framework/View/Element/Template.php b/vendor/magento/framework/View/Element/Template.php
-index 770545d..f011c1e 100644
+index ea1fda7..11f31e7 100644
 --- a/vendor/magento/framework/View/Element/Template.php
 +++ b/vendor/magento/framework/View/Element/Template.php
-@@ -243,8 +243,6 @@ class Template extends AbstractBlock
+@@ -243,9 +243,6 @@ class Template extends AbstractBlock
       */
      public function fetchView($fileName)
      {
--        $this->_logger->info('fetchView Template: ' . $this->getTemplateFile());
+-        $string_to_log = $this->getNameInLayout() . ': fetchView Template: ' . $this->getTemplateFile() . "\n";
+-        $this->_logger->info($string_to_log);
 -
          $relativeFilePath = $this->getRootDirectory()->getRelativePath($fileName);
          \Magento\Framework\Profiler::start(
              'TEMPLATE:' . $fileName,
-@@ -278,7 +276,6 @@ class Template extends AbstractBlock
+@@ -279,7 +276,6 @@ class Template extends AbstractBlock
          if (!$this->getTemplate()) {
              return '';
          }
@@ -81,8 +92,68 @@ index 770545d..f011c1e 100644
          return $this->fetchView($this->getTemplateFile());
      }
  
+diff --git a/vendor/magento/framework/View/Layout.php b/vendor/magento/framework/View/Layout.php
+index 1e62836..5e73497 100644
+--- a/vendor/magento/framework/View/Layout.php
++++ b/vendor/magento/framework/View/Layout.php
+@@ -552,21 +552,7 @@ class Layout extends \Magento\Framework\Simplexml\Config implements \Magento\Fra
+     protected function _renderUiComponent($name)
+     {
+         $uiComponent = $this->getUiComponent($name);
+-
+-        if ($uiComponent)
+-        {
+-            $string_to_log = $name . ' UiComponent before toHtml' . "\n";
+-            $this->logger->info($string_to_log);
+-
+-            $html_to_return = $uiComponent->toHtml();
+-
+-            $string_to_log = $name . ' UiComponent after toHtml' . "\n";
+-            $this->logger->info($string_to_log);
+-
+-            return $html_to_return;
+-        }
+-
+-        return '';
++        return $uiComponent ? $uiComponent->toHtml() : '';
+     }
+ 
+     /**
+@@ -579,17 +565,9 @@ class Layout extends \Magento\Framework\Simplexml\Config implements \Magento\Fra
+     {
+         $html = '';
+         $children = $this->getChildNames($name);
+-
+-        $string_to_log = $name . ' Container before render' . "\n";
+-        $this->logger->info($string_to_log);
+-
+         foreach ($children as $child) {
+             $html .= $this->renderElement($child);
+         }
+-
+-        $string_to_log = $name . ' Container after render' . "\n";
+-        $this->logger->info($string_to_log);
+-
+         if ($html == '' || !$this->structure->getAttribute($name, Element::CONTAINER_OPT_HTML_TAG)) {
+             return $html;
+         }
+diff --git a/vendor/magento/framework/View/Layout/Generator/Block.php b/vendor/magento/framework/View/Layout/Generator/Block.php
+index 1b7df91..9dd316d 100644
+--- a/vendor/magento/framework/View/Layout/Generator/Block.php
++++ b/vendor/magento/framework/View/Layout/Generator/Block.php
+@@ -237,10 +237,6 @@ class Block implements Layout\GeneratorInterface
+         $block = $this->getBlockInstance($block, $arguments);
+         $block->setType(get_class($block));
+         $block->setNameInLayout($name);
+-
+-        $string_to_log = $name . " was created - class: " . get_class($block);
+-        $this->logger->info($string_to_log);
+-
+         $block->addData(isset($arguments['data']) ? $arguments['data'] : []);
+         return $block;
+     }
 diff --git a/vendor/magento/framework/View/Model/Layout/Merge.php b/vendor/magento/framework/View/Model/Layout/Merge.php
-index 4f2f0e2..d419f44 100644
+index 57eff22..72568b2 100644
 --- a/vendor/magento/framework/View/Model/Layout/Merge.php
 +++ b/vendor/magento/framework/View/Model/Layout/Merge.php
 @@ -235,15 +235,9 @@ class Merge implements \Magento\Framework\View\Layout\ProcessorInterface

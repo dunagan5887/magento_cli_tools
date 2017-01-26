@@ -8,7 +8,7 @@ ENABLE_ALL_ERRORS_PATCH="$tools_dir/error_reporting_all.patch"
 
 case $1 in
 tail_logs)
-tail -f -n 500 var/log/system.log var/log/exception.log /var/log/php_errors.log /var/log/fpm-php.www.log /var/log/nginx/error.log
+tail -f -n 500 var/log/system.log var/log/exception.log ./php_errors.log /var/log/php_errors.log /var/log/fpm-php.www.log /var/log/nginx/error.log
 ;;
 tail_all_logs)
 tail -f -n 500 var/log/* /var/log/php_errors.log /var/log/fpm-php.www.log /var/log/nginx/error.log
