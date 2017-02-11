@@ -47,7 +47,7 @@ rm -rf var/cache
 echo "MYSQL Log is no longer enabled. Cache was cleared for change to take effect"
 ;;
 tail_errors)
-tail -f -n 500 /var/log/cli_php_errors.log /var/log/php_errors.log var/log/exception.log var/log/system.log var/log/support_report.log
+tail -f -n 500 /var/log/cli_php_errors.log /var/log/php_errors.log var/log/exception.log var/log/system.log var/log/support_report.log var/log/debug.log
 ;;
 log_layout)
 cat $ENABLE_LAYOUT_LOG_PATCH | patch -p1
@@ -78,6 +78,9 @@ php bin/magento indexer:reindex
 ;;
 flush_cache)
 php bin/magento cache:flush
+;;
+flush_cache_html)
+php bin/magento cache:flush full_page block_html
 ;;
 setup_upgrade)
 php bin/magento setup:upgrade
