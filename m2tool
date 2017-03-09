@@ -89,5 +89,18 @@ wipe_db)
 rm -rf var/cache/ var/page_cache/ app/etc/config.php app/etc/env.php
 echo "Database has been wiped from the Magento instance"
 ;;
+set_developer_mode)
+php bin/magento deploy:mode:set developer && echo "Developer mode has been set"
+;;
+flush_static_content)
+rm -rf  pub/static
+rm -rf  var/cache
+rm -rf  var/composer_home
+rm -rf  var/generation
+rm -rf  var/page_cache
+rm -rf  var/view_preprocessed
+php bin/magento setup:static-content:deploy
+echo "Static content has been flushed"
+;;
 esac
 
