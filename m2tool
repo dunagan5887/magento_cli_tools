@@ -102,5 +102,8 @@ rm -rf  var/view_preprocessed
 php bin/magento setup:static-content:deploy
 echo "Static content has been flushed"
 ;;
+compile)
+php bin/magento setup:di:compile && echo "Code has successfully been compiled"
+;;
 esac
 
