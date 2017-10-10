@@ -2,6 +2,7 @@
 
 script_dir=$(dirname $0)
 tools_dir="$script_dir/mage_tools"
+CHECKOUT_LAYOUT_PATCH="$tools_dir/checkout_layout_patch.patch"
 LOG_LAYOUT_PATCH="$tools_dir/log_layout_patch.patch"
 LOG_MYSQL_PATCH="$tools_dir/log_mysql_patch.patch"
 ENABLE_ALL_ERRORS_PATCH="$tools_dir/error_reporting_all.patch"
@@ -19,8 +20,8 @@ cat $LOG_LAYOUT_PATCH | patch -p1
 echo "Layout Log has been enabled"
 ;;
 checkout_layout)
-git checkout app/code/core/Mage/Core/Block/Template.php
-git checkout app/code/core/Mage/Core/Model/Layout/Update.php
+echo $CHECKOUT_LAYOUT_PATCH
+cat $CHECKOUT_LAYOUT_PATCH | patch -p1
 echo "Layout is no longer being logged"
 ;;
 flush_logs)
