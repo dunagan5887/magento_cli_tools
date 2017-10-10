@@ -54,7 +54,7 @@ cat $ENABLE_LAYOUT_LOG_PATCH | patch -p1
 echo "Layout Log has been enabled"
 ;;
 tail_layout)
-tail -f -n 500 var/log/system.log
+tail -f -n 500 var/log/support_report.log
 ;;
 enterprise_tail_layout)
 tail -f -n 500 var/log/support_report.log
@@ -93,7 +93,9 @@ set_developer_mode)
 php bin/magento deploy:mode:set developer && echo "Developer mode has been set"
 ;;
 flush_static_content)
-rm -rf  pub/static
+mkdir -p pub/static
+rm -rf  pub/static/*
+touch   pub/static/deployed_version.txt
 rm -rf  var/cache
 rm -rf  var/composer_home
 rm -rf  var/generation
