@@ -34,24 +34,19 @@ debug_cron)
 echo "Magento cron was executed with xdebug enabled"
 ;;
 log_mysql)
-cat $LOG_MYSQL_PATCH | patch -p1
-rm -rf var/cache
-echo "MYSQL Log has been enabled. Cache was cleared for change to take effect"
+cat $LOG_MYSQL_PATCH | patch -p1 && php bin/magento cache:flush && php bin/magento setup:di:compile && echo "MYSQL Log has been enabled. Cache was cleared for change to take effect"
 ;;
 tail_mysql)
 tail -f -n 300 var/log/mysql_all_queries.log
 ;;
 checkout_mysql)
-cat $CHECKOUT_LOG_MYSQL_PATCH | patch -p1
-rm -rf var/cache
-echo "MYSQL Log is no longer enabled. Cache was cleared for change to take effect"
+cat $CHECKOUT_LOG_MYSQL_PATCH | patch -p1 && php bin/magento cache:flush && php bin/magento setup:di:compile && echo "MYSQL Log is no longer enabled. Cache was cleared for change to take effect"
 ;;
 tail_errors)
 tail -f -n 500 /var/log/cli_php_errors.log /var/log/php_errors.log var/log/exception.log var/log/system.log var/log/support_report.log var/log/debug.log
 ;;
 log_layout)
-cat $ENABLE_LAYOUT_LOG_PATCH | patch -p1
-echo "Layout Log has been enabled"
+cat $ENABLE_LAYOUT_LOG_PATCH | patch -p1 && echo "Layout Log has been enabled"
 ;;
 tail_layout)
 tail -f -n 500 var/log/support_report.log
@@ -60,8 +55,7 @@ enterprise_tail_layout)
 tail -f -n 500 var/log/support_report.log
 ;;
 checkout_layout)
-cat $CHECKOUT_LAYOUT_LOG_PATCH | patch -p1
-echo "Layout is no longer being logged"
+cat $CHECKOUT_LAYOUT_LOG_PATCH | patch -p1 && echo "Layout is no longer being logged"
 ;;
 flush_logs)
 echo "" > var/log/system.log
@@ -101,8 +95,7 @@ rm -rf  var/composer_home
 rm -rf  var/generation
 rm -rf  var/page_cache
 rm -rf  var/view_preprocessed
-php bin/magento setup:static-content:deploy
-echo "Static content has been flushed"
+php bin/magento setup:static-content:deploy && echo "Static content has been flushed"
 ;;
 compile)
 php bin/magento setup:di:compile && echo "Code has successfully been compiled"
