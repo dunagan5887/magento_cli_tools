@@ -91,8 +91,6 @@ mkdir -p pub/static
 rm -rf  pub/static/*
 touch   pub/static/deployed_version.txt
 rm -rf  var/cache
-rm -rf  var/composer_home
-rm -rf  var/generation
 rm -rf  var/page_cache
 rm -rf  var/view_preprocessed
 php bin/magento setup:static-content:deploy && echo "Static content has been flushed"
