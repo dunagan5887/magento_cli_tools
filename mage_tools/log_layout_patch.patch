@@ -1,5 +1,18 @@
+diff --git a/app/Mage.php b/app/Mage.php
+index 2a93c04..2834e6a 100644
+--- a/app/Mage.php
++++ b/app/Mage.php
+@@ -786,7 +786,7 @@ final class Mage
+     {
+         $message = sprintf("[%s]%s", gethostname(), $message);
+         if (!self::getConfig() || empty($file) || strtolower($file) == 'system.log') {
+-            return;
++            //return;
+         }
+ 
+         try {
 diff --git a/app/code/core/Mage/Core/Block/Template.php b/app/code/core/Mage/Core/Block/Template.php
-index a6d310b..16071f4 100644
+index 1eb2004..9c7f20d 100644
 --- a/app/code/core/Mage/Core/Block/Template.php
 +++ b/app/code/core/Mage/Core/Block/Template.php
 @@ -280,6 +280,10 @@ HTML;
@@ -14,7 +27,7 @@ index a6d310b..16071f4 100644
              return '';
          }
 diff --git a/app/code/core/Mage/Core/Model/Layout/Update.php b/app/code/core/Mage/Core/Model/Layout/Update.php
-index f8296e9..f271d85 100644
+index 642b810..4c52eaa 100644
 --- a/app/code/core/Mage/Core/Model/Layout/Update.php
 +++ b/app/code/core/Mage/Core/Model/Layout/Update.php
 @@ -126,6 +126,8 @@ class Mage_Core_Model_Layout_Update
