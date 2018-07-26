@@ -6,6 +6,8 @@ LOG_MYSQL_PATCH="$tools_dir/m2tool_log_mysql.patch"
 CHECKOUT_LOG_MYSQL_PATCH="$tools_dir/m2tool_checkout_mysql.patch"
 ENABLE_LAYOUT_LOG_PATCH="$tools_dir/m2tool_enable_layout_log.patch"
 CHECKOUT_LAYOUT_LOG_PATCH="$tools_dir/m2tool_checkout_layout_log.patch"
+ADD_PROFILING_PATCH="$tools_dir/m2tool_add_profiling.patch"
+CHECKOUT_PROFILING_PATCH="$tools_dir/m2tool_checkout_profiling.patch"
 
 case $1 in
 module_enable)
@@ -56,6 +58,12 @@ tail -f -n 500 var/log/support_report.log
 ;;
 checkout_layout)
 cat $CHECKOUT_LAYOUT_LOG_PATCH | patch -p1 && echo "Layout is no longer being logged"
+;;
+add_profiling)
+cat $ADD_PROFILING_PATCH | patch -p1 && echo "Enhanced profiling has been added"
+;;
+checkout_profiling)
+cat $CHECKOUT_PROFILING_PATCH | patch -p1 && echo "Enhanced profiling has been removed"
 ;;
 flush_logs)
 echo "" > var/log/system.log

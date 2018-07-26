@@ -1,0 +1,100 @@
+diff --git a/vendor/magento/framework/Interception/Chain/Chain.php b/vendor/magento/framework/Interception/Chain/Chain.php
+index 75b0a2d..6e93be7 100644
+--- a/vendor/magento/framework/Interception/Chain/Chain.php
++++ b/vendor/magento/framework/Interception/Chain/Chain.php
+@@ -49,7 +49,15 @@ class Chain implements \Magento\Framework\Interception\ChainInterface
+             foreach ($pluginInfo[DefinitionInterface::LISTENER_BEFORE] as $code) {
+                 $pluginInstance = $this->pluginList->getPlugin($type, $code);
+                 $pluginMethod = 'before' . $capMethod;
++
++                $before_profile_timer = $type . '::' . $method . '() BEFORE-PLUGIN ' . get_class($pluginInstance) . '::' . $pluginMethod . '()';
++                
++                \Magento\Framework\Profiler::start($before_profile_timer);
++
+                 $beforeResult = $pluginInstance->$pluginMethod($subject, ...array_values($arguments));
++
++                \Magento\Framework\Profiler::stop($before_profile_timer);
++
+                 if ($beforeResult) {
+                     $arguments = $beforeResult;
+                 }
+@@ -64,14 +72,29 @@ class Chain implements \Magento\Framework\Interception\ChainInterface
+             };
+             $pluginInstance = $this->pluginList->getPlugin($type, $code);
+             $pluginMethod = 'around' . $capMethod;
++
++            $around_profile_timer = $type . '::' . $method . '() AROUND-PLUGIN ' . get_class($pluginInstance) . '::' . $pluginMethod . '()';
++
++            \Magento\Framework\Profiler::start($around_profile_timer);
++
+             $result = $pluginInstance->$pluginMethod($subject, $next, ...array_values($arguments));
++
++            \Magento\Framework\Profiler::stop($around_profile_timer);
++
+             unset($pluginInstance, $pluginMethod);
+         } else {
+             $result = $subject->___callParent($method, $arguments);
+         }
+         if (isset($pluginInfo[DefinitionInterface::LISTENER_AFTER])) {
+             foreach ($pluginInfo[DefinitionInterface::LISTENER_AFTER] as $code) {
++
++                $after_profile_timer = $type . '::' . $method . '() AFTER-PLUGIN ' . get_class($this->pluginList->getPlugin($type, $code)) . '::' . $capMethod . '()';
++
++                \Magento\Framework\Profiler::start($after_profile_timer);
++
+                 $result = $this->pluginList->getPlugin($type, $code)->{'after' . $capMethod}($subject, $result);
++
++                \Magento\Framework\Profiler::stop($after_profile_timer);
+             }
+         }
+         return $result;
+diff --git a/vendor/magento/module-configurable-product/Block/Product/View/Type/Configurable.php b/vendor/magento/module-configurable-product/Block/Product/View/Type/Configurable.php
+index 33ac01f..932360e 100644
+--- a/vendor/magento/module-configurable-product/Block/Product/View/Type/Configurable.php
++++ b/vendor/magento/module-configurable-product/Block/Product/View/Type/Configurable.php
+@@ -166,6 +166,10 @@ class Configurable extends \Magento\Catalog\Block\Product\View\AbstractView
+      */
+     public function getJsonConfig()
+     {
++        $profile_timer = 'Magento\ConfigurableProduct\Block\Product\View\Type\Configurable::getJsonConfig()';
++
++        \Magento\Framework\Profiler::start($profile_timer);
++
+         $store = $this->getCurrentStore();
+         $currentProduct = $this->getProduct();
+ 
+@@ -204,6 +208,8 @@ class Configurable extends \Magento\Catalog\Block\Product\View\AbstractView
+ 
+         $config = array_merge($config, $this->_getAdditionalConfig());
+ 
++        \Magento\Framework\Profiler::stop($profile_timer);
++
+         return $this->jsonEncoder->encode($config);
+     }
+ 
+diff --git a/vendor/magento/module-configurable-product/Helper/Data.php b/vendor/magento/module-configurable-product/Helper/Data.php
+index f7790ce..6085aa7 100644
+--- a/vendor/magento/module-configurable-product/Helper/Data.php
++++ b/vendor/magento/module-configurable-product/Helper/Data.php
+@@ -77,6 +77,11 @@ class Data
+      */
+     public function getOptions($currentProduct, $allowedProducts)
+     {
++
++        $profile_timer = 'Magento\ConfigurableProduct\Helper\Data::getOptions()';
++
++        \Magento\Framework\Profiler::start($profile_timer);
++
+         $options = [];
+         foreach ($allowedProducts as $product) {
+             $productId = $product->getId();
+@@ -103,6 +108,9 @@ class Data
+                 $options['index'][$productId][$productAttributeId] = $attributeValue;
+             }
+         }
++
++        \Magento\Framework\Profiler::stop($profile_timer);
++
+         return $options;
+     }
+ 
