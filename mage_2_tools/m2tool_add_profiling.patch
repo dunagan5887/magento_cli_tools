@@ -48,6 +48,90 @@ index 75b0a2d..6e93be7 100644
              }
          }
          return $result;
+diff --git a/vendor/magento/framework/Interception/Interceptor.php b/vendor/magento/framework/Interception/Interceptor.php
+index 45dba36..ea69d2c 100644
+--- a/vendor/magento/framework/Interception/Interceptor.php
++++ b/vendor/magento/framework/Interception/Interceptor.php
+@@ -120,7 +120,15 @@ trait Interceptor
+             foreach ($pluginInfo[DefinitionInterface::LISTENER_BEFORE] as $code) {
+                 $pluginInstance = $this->pluginList->getPlugin($this->subjectType, $code);
+                 $pluginMethod = 'before' . $capMethod;
++
++                $before_profile_timer = 'BEFORE-PLUGIN ' . get_class($pluginInstance) . '::' . $pluginMethod . '()';
++
++                \Magento\Framework\Profiler::start($before_profile_timer);
++
+                 $beforeResult = $pluginInstance->$pluginMethod($this, ...array_values($arguments));
++
++                \Magento\Framework\Profiler::stop($before_profile_timer);
++
+                 if ($beforeResult) {
+                     $arguments = $beforeResult;
+                 }
+@@ -139,7 +147,15 @@ trait Interceptor
+             };
+             $pluginInstance = $this->pluginList->getPlugin($this->subjectType, $code);
+             $pluginMethod = 'around' . $capMethod;
++
++            $around_profile_timer = 'AROUND-PLUGIN ' . get_class($pluginInstance) . '::' . $pluginMethod . '()';
++
++            \Magento\Framework\Profiler::start($around_profile_timer);
++
+             $result = $pluginInstance->$pluginMethod($this, $next, ...array_values($arguments));
++
++            \Magento\Framework\Profiler::stop($around_profile_timer);
++
+             unset($pluginInstance, $pluginMethod);
+         } else {
+             // Call original method
+@@ -148,8 +164,15 @@ trait Interceptor
+         if (isset($pluginInfo[DefinitionInterface::LISTENER_AFTER])) {
+             // Call 'after' listeners
+             foreach ($pluginInfo[DefinitionInterface::LISTENER_AFTER] as $code) {
++
++                $after_profile_timer = 'AFTER-PLUGIN ' . get_class($this->pluginList->getPlugin($this->subjectType, $code)) . '::' . $capMethod . '()';
++
++                \Magento\Framework\Profiler::start($after_profile_timer);
++
+                 $result = $this->pluginList->getPlugin($this->subjectType, $code)
+                     ->{'after' . $capMethod}($this, $result);
++
++                \Magento\Framework\Profiler::stop($after_profile_timer);
+             }
+         }
+         return $result;
+diff --git a/vendor/magento/framework/View/Element/AbstractBlock.php b/vendor/magento/framework/View/Element/AbstractBlock.php
+index 6e93c77..da83996 100644
+--- a/vendor/magento/framework/View/Element/AbstractBlock.php
++++ b/vendor/magento/framework/View/Element/AbstractBlock.php
+@@ -641,11 +641,18 @@ abstract class AbstractBlock extends \Magento\Framework\DataObject implements Bl
+      */
+     public function toHtml()
+     {
++        $profile_timer = 'Block toHtml - ' . $this->_nameInLayout;
++
++        \Magento\Framework\Profiler::start($profile_timer);
++
+         $this->_eventManager->dispatch('view_block_abstract_to_html_before', ['block' => $this]);
+         if ($this->_scopeConfig->getValue(
+             'advanced/modules_disable_output/' . $this->getModuleName(),
+             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+         )) {
++
++            \Magento\Framework\Profiler::stop($profile_timer);
++
+             return '';
+         }
+ 
+@@ -665,6 +672,8 @@ abstract class AbstractBlock extends \Magento\Framework\DataObject implements Bl
+         }
+         $html = $this->_afterToHtml($html);
+ 
++        \Magento\Framework\Profiler::stop($profile_timer);
++
+         return $html;
+     }
+ 
 diff --git a/vendor/magento/module-configurable-product/Block/Product/View/Type/Configurable.php b/vendor/magento/module-configurable-product/Block/Product/View/Type/Configurable.php
 index 33ac01f..932360e 100644
 --- a/vendor/magento/module-configurable-product/Block/Product/View/Type/Configurable.php
