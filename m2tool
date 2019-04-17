@@ -94,14 +94,17 @@ echo "Database has been wiped from the Magento instance"
 set_developer_mode)
 php bin/magento deploy:mode:set developer && echo "Developer mode has been set"
 ;;
-flush_static_content)
+flush_static_content_and_remove_directories)
 mkdir -p pub/static
 rm -rf  pub/static/*
 touch   pub/static/deployed_version.txt
 rm -rf  var/cache
 rm -rf  var/page_cache
 rm -rf  var/view_preprocessed
-php bin/magento setup:static-content:deploy && echo "Static content has been flushed"
+php bin/magento setup:static-content:deploy -f && echo "Static content has been flushed"
+;;
+flush_static_content)
+php bin/magento setup:static-content:deploy -f && echo "Static content has been flushed"
 ;;
 compile)
 php bin/magento setup:di:compile && echo "Code has successfully been compiled"
