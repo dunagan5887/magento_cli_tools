@@ -1,0 +1,10 @@
+#!/bin/bash
+
+container_name=$1
+
+
+answer=$(php /etc/magento_cli_tools/sudoSshIntoDockerByName.php $container_name)
+
+
+sudo docker exec -t -i $answer /bin/bash
+
