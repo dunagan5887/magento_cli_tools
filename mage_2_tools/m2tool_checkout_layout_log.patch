@@ -1,36 +1,32 @@
 diff --git a/vendor/magento/framework/View/Element/AbstractBlock.php b/vendor/magento/framework/View/Element/AbstractBlock.php
-index f12c994..1700186 100644
+index dfc42c9..ea47c22 100644
 --- a/vendor/magento/framework/View/Element/AbstractBlock.php
 +++ b/vendor/magento/framework/View/Element/AbstractBlock.php
-@@ -641,12 +641,6 @@ abstract class AbstractBlock extends \Magento\Framework\DataObject implements Bl
+@@ -667,9 +667,6 @@ abstract class AbstractBlock extends \Magento\Framework\DataObject implements Bl
       */
      public function toHtml()
      {
--
 -        $string_to_log = $this->getNameInLayout() . ': Abstract toHtml - Block class: ' . get_class($this) . "\n";
 -        $this->_logger->info($string_to_log);
--
--
 -
          $this->_eventManager->dispatch('view_block_abstract_to_html_before', ['block' => $this]);
          if ($this->_scopeConfig->getValue(
              'advanced/modules_disable_output/' . $this->getModuleName(),
-@@ -970,10 +964,6 @@ abstract class AbstractBlock extends \Magento\Framework\DataObject implements Bl
+@@ -1045,9 +1042,6 @@ abstract class AbstractBlock extends \Magento\Framework\DataObject implements Bl
       */
      public function getCacheKey()
      {
 -        $string_to_log = $this->getNameInLayout() . ' getCacheKey - Block: ' . get_class($this) . "\n";
 -        $this->_logger->info($string_to_log);
 -
--
          if ($this->hasData('cache_key')) {
              return static::CACHE_KEY_PREFIX . $this->getData('cache_key');
          }
 diff --git a/vendor/magento/framework/View/Element/BlockFactory.php b/vendor/magento/framework/View/Element/BlockFactory.php
-index 20348af..8c75a31 100644
+index ecafffa..f159a9f 100644
 --- a/vendor/magento/framework/View/Element/BlockFactory.php
 +++ b/vendor/magento/framework/View/Element/BlockFactory.php
-@@ -21,13 +21,10 @@ class BlockFactory
+@@ -22,8 +22,6 @@ class BlockFactory
       */
      protected $objectManager;
  
@@ -39,12 +35,7 @@ index 20348af..8c75a31 100644
      /**
       * Constructor
       *
-      * @param ObjectManagerInterface $objectManager
--     * @param \Psr\Log\LoggerInterface $logger
-      */
-     public function __construct(ObjectManagerInterface $objectManager)
-     {
-@@ -45,9 +42,6 @@ class BlockFactory
+@@ -45,9 +43,6 @@ class BlockFactory
      public function createBlock($blockName, array $arguments = [])
      {
          $blockName = ltrim($blockName, '\\');
@@ -54,11 +45,10 @@ index 20348af..8c75a31 100644
          $block = $this->objectManager->create($blockName, $arguments);
          if (!$block instanceof BlockInterface) {
              throw new \LogicException($blockName . ' does not implement BlockInterface');
-@@ -57,15 +51,4 @@ class BlockFactory
+@@ -57,14 +52,4 @@ class BlockFactory
          }
          return $block;
      }
--
 -
 -    protected function _getLogger()
 -    {
@@ -71,10 +61,10 @@ index 20348af..8c75a31 100644
 -    }
  }
 diff --git a/vendor/magento/framework/View/Element/Template.php b/vendor/magento/framework/View/Element/Template.php
-index ea1fda7..11f31e7 100644
+index b3359b5..e9f164c 100644
 --- a/vendor/magento/framework/View/Element/Template.php
 +++ b/vendor/magento/framework/View/Element/Template.php
-@@ -243,9 +243,6 @@ class Template extends AbstractBlock
+@@ -261,9 +261,6 @@ class Template extends AbstractBlock
       */
      public function fetchView($fileName)
      {
@@ -84,19 +74,11 @@ index ea1fda7..11f31e7 100644
          $relativeFilePath = $this->getRootDirectory()->getRelativePath($fileName);
          \Magento\Framework\Profiler::start(
              'TEMPLATE:' . $fileName,
-@@ -279,7 +276,6 @@ class Template extends AbstractBlock
-         if (!$this->getTemplate()) {
-             return '';
-         }
--
-         return $this->fetchView($this->getTemplateFile());
-     }
- 
 diff --git a/vendor/magento/framework/View/Layout.php b/vendor/magento/framework/View/Layout.php
-index 1e62836..5e73497 100644
+index b8847e6..eeba748 100644
 --- a/vendor/magento/framework/View/Layout.php
 +++ b/vendor/magento/framework/View/Layout.php
-@@ -552,21 +552,7 @@ class Layout extends \Magento\Framework\Simplexml\Config implements \Magento\Fra
+@@ -588,21 +588,7 @@ class Layout extends \Magento\Framework\Simplexml\Config implements \Magento\Fra
      protected function _renderUiComponent($name)
      {
          $uiComponent = $this->getUiComponent($name);
@@ -119,7 +101,7 @@ index 1e62836..5e73497 100644
      }
  
      /**
-@@ -579,17 +565,9 @@ class Layout extends \Magento\Framework\Simplexml\Config implements \Magento\Fra
+@@ -616,17 +602,9 @@ class Layout extends \Magento\Framework\Simplexml\Config implements \Magento\Fra
      {
          $html = '';
          $children = $this->getChildNames($name);
@@ -128,7 +110,7 @@ index 1e62836..5e73497 100644
 -        $this->logger->info($string_to_log);
 -
          foreach ($children as $child) {
-             $html .= $this->renderElement($child);
+             $html .= $this->renderElement($child, $useCache);
          }
 -
 -        $string_to_log = $name . ' Container after render' . "\n";
@@ -138,10 +120,10 @@ index 1e62836..5e73497 100644
              return $html;
          }
 diff --git a/vendor/magento/framework/View/Layout/Generator/Block.php b/vendor/magento/framework/View/Layout/Generator/Block.php
-index 1b7df91..9dd316d 100644
+index 95d7f4a..27af40f 100644
 --- a/vendor/magento/framework/View/Layout/Generator/Block.php
 +++ b/vendor/magento/framework/View/Layout/Generator/Block.php
-@@ -237,10 +237,6 @@ class Block implements Layout\GeneratorInterface
+@@ -252,10 +252,6 @@ class Block implements Layout\GeneratorInterface
          $block = $this->getBlockInstance($block, $arguments);
          $block->setType(get_class($block));
          $block->setNameInLayout($name);
@@ -153,10 +135,10 @@ index 1b7df91..9dd316d 100644
          return $block;
      }
 diff --git a/vendor/magento/framework/View/Model/Layout/Merge.php b/vendor/magento/framework/View/Model/Layout/Merge.php
-index 57eff22..72568b2 100644
+index 011a8c8..239d416 100644
 --- a/vendor/magento/framework/View/Model/Layout/Merge.php
 +++ b/vendor/magento/framework/View/Model/Layout/Merge.php
-@@ -235,15 +235,9 @@ class Merge implements \Magento\Framework\View\Layout\ProcessorInterface
+@@ -274,15 +274,9 @@ class Merge implements \Magento\Framework\View\Layout\ProcessorInterface
      {
          if (is_array($handleName)) {
              foreach ($handleName as $name) {
