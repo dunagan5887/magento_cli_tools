@@ -70,11 +70,7 @@ foreach (glob($modulesDir . '*/*/Setup/*.php') as $filename) {
     // Load the PHP file into a string
     $phpCode = file_get_contents($filename);
 
-
-    echo "PHP filename" . $filename . "\n";
-
     // Find and process all addAttribute calls
-    preg_match_all('/>addAttribute\s*\(\s*(\w+)\s*,\s*\'(\w+)\'/', $phpCode, $matches, PREG_SET_ORDER);
     preg_match_all('/>addAttribute\s*\(\s*([^,]+)\s*,\s*\'([^\']+)\'/', $phpCode, $matches, PREG_SET_ORDER);
 
     foreach ($matches as $match) {
